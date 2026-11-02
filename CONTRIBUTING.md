@@ -8,7 +8,7 @@ documentation improvements are welcome.
 Python 3.10 or newer is required.
 
 ```bash
-git clone https://github.com/prodmoh/ganivra-python.git
+git clone https://github.com/ProdMoh/ganivra-python.git
 cd ganivra-python
 python -m venv .venv
 source .venv/bin/activate

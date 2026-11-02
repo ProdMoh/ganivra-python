@@ -2,8 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/ganivra)](https://pypi.org/project/ganivra/)
 [![Python](https://img.shields.io/pypi/pyversions/ganivra)](https://pypi.org/project/ganivra/)
-[![CI](https://github.com/prodmoh/ganivra-python/actions/workflows/ci.yml/badge.svg)](https://github.com/prodmoh/ganivra-python/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/prodmoh/ganivra-python/blob/main/LICENSE)
+[![CI](https://github.com/ProdMoh/ganivra-python/actions/workflows/ci.yml/badge.svg)](https://github.com/ProdMoh/ganivra-python/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/ProdMoh/ganivra-python/blob/main/LICENSE)
 
 Track what each customer's AI calls cost you. Add two lines to an existing
 OpenAI or Claude app and Ganivra records every call's model and token usage,

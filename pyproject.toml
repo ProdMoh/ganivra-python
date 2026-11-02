@@ -28,9 +28,9 @@ dependencies = ["openai>=1.50"]
 [project.urls]
 Homepage = "https://ganivra.com"
 Documentation = "https://ganivra.com/integration"
-Source = "https://github.com/prodmoh/ganivra-python"
-Issues = "https://github.com/prodmoh/ganivra-python/issues"
-Changelog = "https://github.com/prodmoh/ganivra-python/blob/main/CHANGELOG.md"
+Source = "https://github.com/ProdMoh/ganivra-python"
+Issues = "https://github.com/ProdMoh/ganivra-python/issues"
+Changelog = "https://github.com/ProdMoh/ganivra-python/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 anthropic = ["anthropic>=0.125,<0.126"]
