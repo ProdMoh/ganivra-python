@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ganivra"
+version = "0.6.2"
+description = "AI cost and unit-economics SDK for OpenAI, Claude, MCP tools, delivery costs, and revenue"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Ganivra" }]
+keywords = ["ai", "llm", "openai", "mcp", "observability", "cost", "unit-economics"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+dependencies = ["openai>=1.50"]
+
+[project.urls]
+Homepage = "https://ganivra.com"
+Documentation = "https://ganivra.com/integration"
+Source = "https://github.com/prodmoh/ganivra-python"
+Issues = "https://github.com/prodmoh/ganivra-python/issues"
+Changelog = "https://github.com/prodmoh/ganivra-python/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.125,<0.126"]
+test = ["pytest>=8.0", "anthropic>=0.125,<0.126"]
+release = ["build>=1.2", "twine>=6.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ganivra"]
+
+[tool.hatch.build.targets.sdist]
+include = ["ganivra", "tests", "examples", "README.md", "REST_CLIENT.md", "CHANGELOG.md", "LICENSE", "pyproject.toml"]

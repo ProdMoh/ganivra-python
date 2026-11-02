@@ -1,0 +1,33 @@
+name: Bug report
+description: Something in the SDK doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Don't include API keys, prompts, responses or customer data. For account or billing questions, contact support instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal code to reproduce
+      render: python
+  - type: input
+    id: sdk-version
+    attributes:
+      label: Ganivra SDK version
+      placeholder: "python -c 'import ganivra; print(ganivra.__version__)'"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Python version and provider SDK versions
+      placeholder: "Python 3.12, openai 1.x, anthropic 0.125"
+    validations:
+      required: true

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Account, billing or dashboard help
+    url: https://prodmoh.com/share/form/Um0pPbniJFEjrChl25WI
+    about: Contact Ganivra support for anything that isn't an SDK bug.
+  - name: Integration guide
+    url: https://ganivra.com/integration
+    about: Setup, event schema and REST API reference.
