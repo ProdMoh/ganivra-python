@@ -84,6 +84,30 @@ class Economics(Resource):
         """POST /v1/economics/model-policies. Pass REST fields in payload/params."""
         return self._client.request('POST', f'/v1/economics/model-policies', params=params, payload=payload)
 
+    def gpu_pools(self, *, params: Mapping[str, Any] | None = None) -> Any:
+        """GET /v1/economics/gpu-pools. Pass REST fields in payload/params."""
+        return self._client.request('GET', f'/v1/economics/gpu-pools', params=params)
+
+    def gpu_tenants(self, *, params: Mapping[str, Any] | None = None) -> Any:
+        """GET /v1/economics/gpu-tenants. Pass days in params for the period."""
+        return self._client.request('GET', f'/v1/economics/gpu-tenants', params=params)
+
+    def gpu_move_analysis(self, *, params: Mapping[str, Any] | None = None) -> Any:
+        """GET /v1/economics/gpu-move-analysis. Pass pool_id, or hourly_rate_usd and tokens_per_gpu_second, in params."""
+        return self._client.request('GET', f'/v1/economics/gpu-move-analysis', params=params)
+
+    def create_gpu_pool(self, *, payload: Mapping[str, Any], params: Mapping[str, Any] | None = None) -> Any:
+        """POST /v1/economics/gpu-pools. Pass REST fields in payload/params."""
+        return self._client.request('POST', f'/v1/economics/gpu-pools', params=params, payload=payload)
+
+    def end_gpu_pool(self, pool_id: str, *, payload: Mapping[str, Any], params: Mapping[str, Any] | None = None) -> Any:
+        """POST /v1/economics/gpu-pools/{pool_id}/end. Pass REST fields in payload/params."""
+        return self._client.request('POST', f'/v1/economics/gpu-pools/{pool_id}/end', params=params, payload=payload)
+
+    def delete_gpu_pool(self, pool_id: str, *, params: Mapping[str, Any] | None = None) -> Any:
+        """DELETE /v1/economics/gpu-pools/{pool_id}. Pass REST fields in payload/params."""
+        return self._client.request('DELETE', f'/v1/economics/gpu-pools/{pool_id}', params=params)
+
 
 class Delivery(Resource):
     def create(self, *, payload: Mapping[str, Any], params: Mapping[str, Any] | None = None) -> Any:

@@ -4,20 +4,20 @@ import atexit
 from contextlib import contextmanager
 from decimal import Decimal
 import threading
-from typing import Any, Iterator, Mapping
+from typing import Any, Iterator, Mapping, Sequence
 
 from .client import Client, APIError
 from .config import Config
 from .context import trace
 from .delivery import DeliveryCosts
 from .economics import GanivraAPIError, Transactions
-from .instrumentation import instrument_openai
+from .instrumentation import instrument_openai, set_self_hosted_hosts
 from .anthropic_instrumentation import instrument_anthropic
 from .mcp import MCPCallContext, observe_mcp_call
 from .sender import BackgroundSender
 
 __all__ = ["Client", "APIError", "init", "trace", "mcp_call", "flush", "transactions", "delivery_costs", "GanivraAPIError", "MCPCallContext"]
-__version__ = "0.6.2"
+__version__ = "0.6.3"
 
 _lock = threading.Lock()
 _config: Config | None = None
@@ -41,8 +41,14 @@ def init(
     batch_size: int = 20,
     timeout_seconds: float = 2.0,
     max_retries: int = 2,
+    self_hosted_hosts: Sequence[str] = (),
 ) -> None:
-    """Initialize best-effort telemetry and instrument installed supported providers once per process."""
+    """Initialize best-effort telemetry and instrument installed supported providers once per process.
+
+    self_hosted_hosts lists the hosts of your own OpenAI-compatible model servers, such as
+    ("vllm.internal", "localhost"). Their calls are recorded as provider "self_hosted" and
+    priced as a share of the GPU pools set up in Ganivra.
+    """
 
     global _config, _sender
     config = Config(
@@ -54,6 +60,7 @@ def init(
         timeout_seconds=timeout_seconds,
         max_retries=max_retries,
     )
+    set_self_hosted_hosts(self_hosted_hosts)
     with _lock:
         previous = _sender
         _config = config

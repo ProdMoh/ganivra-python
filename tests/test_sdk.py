@@ -421,6 +421,16 @@ def test_open_model_providers_are_detected_from_the_base_url() -> None:
     assert detect_provider(resource("api.together.ai")) == "together"
     assert detect_provider(resource("api.fireworks.ai")) == "fireworks"
     assert detect_provider(resource("api.deepinfra.com")) == "deepinfra"
+    assert detect_provider(resource("api.sarvam.ai")) == "sarvam"
+    from ganivra.instrumentation import set_self_hosted_hosts
+    set_self_hosted_hosts(["vllm.internal", "localhost"])
+    try:
+        assert detect_provider(resource("vllm.internal")) == "self_hosted"
+        assert detect_provider(resource("gpu1.vllm.internal")) == "self_hosted"
+        assert detect_provider(resource("localhost")) == "self_hosted"
+        assert detect_provider(resource("api.together.xyz")) == "together"
+    finally:
+        set_self_hosted_hosts(())
     assert detect_provider(resource("inference.baseten.co")) == "baseten"
     assert detect_provider(resource("api.openai.com")) == "openai"
     assert detect_provider(resource("nottogether.ai")) == "openai"
@@ -461,3 +471,14 @@ def test_chat_completions_are_recorded_with_the_detected_provider(monkeypatch: p
     list(Completions().create(model="m", stream=True))
     assert events[2]["usage_details"] == {"usage_incomplete": 1}
     assert len(events) == 3
+
+
+def test_self_hosted_calls_carry_the_response_id_to_match_the_servers_trace() -> None:
+    response = SimpleNamespace(id="chatcmpl-0f3a", model="deepseek-ai/DeepSeek-V4.1-Flash",
+                               usage=SimpleNamespace(prompt_tokens=10, completion_tokens=5, total_tokens=15))
+    event = build_event(response=response, requested_model=None, latency_ms=1, environment="test", provider="self_hosted",
+                        operation="chat.completions.create")
+    assert event["attributes"]["request_id"] == "chatcmpl-0f3a"
+    api = build_event(response=response, requested_model=None, latency_ms=1, environment="test", provider="together",
+                      operation="chat.completions.create")
+    assert "request_id" not in api["attributes"]

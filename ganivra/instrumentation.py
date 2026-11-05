@@ -34,7 +34,17 @@ def detect_platform(resource: Any) -> str | None:
 # OpenAI-compatible APIs for open models, identified by the client's base URL so their
 # calls are priced at that provider's rates. Other hosts keep the "openai" provider.
 _PROVIDER_HOSTS = (("together.xyz", "together"), ("together.ai", "together"), ("fireworks.ai", "fireworks"),
-                   ("deepinfra.com", "deepinfra"), ("baseten.co", "baseten"))
+                   ("deepinfra.com", "deepinfra"), ("baseten.co", "baseten"), ("sarvam.ai", "sarvam"))
+
+
+# Hosts of the workspace's own model servers (vLLM, SGLang, TGI...), set by ganivra.init().
+# Their calls are recorded as "self_hosted" and priced as a share of the workspace's GPU pools.
+_SELF_HOSTED_HOSTS: frozenset[str] = frozenset()
+
+
+def set_self_hosted_hosts(hosts: Any) -> None:
+    global _SELF_HOSTED_HOSTS
+    _SELF_HOSTED_HOSTS = frozenset(str(h).strip().lower() for h in hosts or () if str(h).strip())
 
 
 def detect_provider(resource: Any) -> str:
@@ -43,6 +53,8 @@ def detect_provider(resource: Any) -> str:
         host = str(getattr(getattr(getattr(resource, "_client", None), "base_url", None), "host", "") or "").lower()
     except Exception:
         return "openai"
+    if any(host == h or host.endswith("." + h) for h in _SELF_HOSTED_HOSTS):
+        return "self_hosted"
     for suffix, provider in _PROVIDER_HOSTS:
         if host == suffix or host.endswith("." + suffix):
             return provider
@@ -117,6 +129,11 @@ def build_event(
     }
     if active_trace is not None and active_trace.parent_step_id is not None:
         event["parent_step_id"] = active_trace.parent_step_id
+    # A self-hosted server's response id (vLLM's request id) matches the server's own trace,
+    # which reports the call's GPU time.
+    response_id = _value(response, "id") if provider == "self_hosted" else None
+    if isinstance(response_id, str) and response_id:
+        event["attributes"] = {**event["attributes"], "request_id": response_id[:200]}
     details = {**(service_tier_details(response) if error is None else {}), **(usage_details or {})}
     if details:
         event["usage_details"] = details

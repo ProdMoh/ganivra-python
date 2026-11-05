@@ -23,6 +23,7 @@ plan attribution, and confirmed purchase or subscription transactions.
 | OpenAI Responses | Automatic for synchronous, non-streaming calls |
 | Claude Messages | Automatic for sync, async, and streaming calls with `ganivra[anthropic]` |
 | OpenAI Chat Completions and open-model APIs | Automatic for synchronous calls, including streaming. A client pointed at Together AI, Fireworks, DeepInfra or Baseten is recorded under that provider and priced at its rates; other base URLs are recorded as `openai`. Streams need `stream_options={"include_usage": True}`; without it the call is recorded as unpriced |
+| Self-hosted models (vLLM, SGLang, TGI) | Automatic for hosts listed in `self_hosted_hosts` (0.6.3); priced as a share of your GPU pools |
 | MCP tools | Instrument with `ganivra.mcp_call(...)` or submit through REST |
 | Gemini and other providers | Submit complete usage through `ganivra.Client`; not automatically instrumented |
 | Customer, workflow, feature, prompt, plan, and agent attribution | Supported through trace attributes and explicit events |
@@ -235,6 +236,33 @@ contribution and margin display a currency-normalization warning. Use
 belongs to a particular AI result. This call is synchronous and raises
 `ganivra.GanivraAPIError` if Ganivra does not accept the transaction; only call
 it after your own payment and entitlement updates succeed.
+
+## Self-hosted models on your own GPUs
+
+From 0.6.3, name your own OpenAI-compatible model servers once. Their calls are
+recorded as provider `self_hosted` with the response id as
+`attributes.request_id`, so Ganivra can match vLLM's trace for the request.
+
+```python
+ganivra.init(api_key="gv_live_your_workspace_key", self_hosted_hosts=["vllm.internal"])
+```
+
+Add the GPUs as a pool in Ganivra (Dashboard → Own GPUs, or the client below).
+Each UTC day's GPU bill is split across that day's calls. A pool rented to one
+customer charges them every hour, idle included, and with a sell rate shows the
+margin on them:
+
+```python
+admin = Client(access_token=current_user_access_token, workspace_id=workspace_id)
+admin.economics.create_gpu_pool(payload={
+    "name": "Acme node", "gpu_type": "B200", "gpu_count": 8, "hourly_rate_usd": 6.69,
+    "customer_id": "acme", "sell_hourly_rate_usd": 9.50,
+})
+tenants = admin.economics.gpu_tenants(params={"days": 30})
+```
+
+See the [self-hosted setup](https://ganivra.com/integration#self-hosted) for
+vLLM traces and GPU utilization metrics.
 
 ## Configuration
 
