@@ -5,16 +5,80 @@
 [![CI](https://github.com/ProdMoh/ganivra-python/actions/workflows/ci.yml/badge.svg)](https://github.com/ProdMoh/ganivra-python/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/ProdMoh/ganivra-python/blob/main/LICENSE)
 
-Track what each customer's AI calls cost you. Add two lines to an existing
-OpenAI or Claude app and Ganivra records every call's model and token usage,
-prices it, and adds it up by customer, workflow and feature. See
-[ganivra.com](https://ganivra.com) and the [integration guide](https://ganivra.com/integration).
+See which customers and workflows drive your AI costs. Ganivra captures model
+usage from your Python app and connects calls to the customer action that
+caused them. Add revenue to see contribution after recorded AI costs.
+
+Two customer actions can each earn $0.05. If one costs $0.01 in AI calls and
+the other costs $0.08, they leave $0.04 and lose $0.03 respectively. These
+illustrative amounts show what customer attribution helps you investigate.
+
+- Find the customers and workflows responsible for your largest costs.
+- Inspect the model and MCP calls behind one customer action.
+- Compare recorded costs with customer revenue.
+
+[Create a workspace](https://ganivra.com/signup?utm_source=github&utm_medium=readme&utm_campaign=ganivra_python)
+· [Integration guide](https://ganivra.com/integration?utm_source=github&utm_medium=readme&utm_campaign=ganivra_python)
+· [Runnable examples](examples/README.md)
+· [Open price dataset](https://github.com/ProdMoh/llm-prices)
 
 Ganivra measures AI cost, revenue, profit, and margin without proxying model
 traffic or storing prompt and response bodies. Version 0.6 supports automatic
 OpenAI Responses and Claude Messages telemetry, explicit provider-independent
 REST events, MCP tool calls, non-model delivery costs, pricing plans, customer
 plan attribution, and confirmed purchase or subscription transactions.
+
+## Start with one customer action
+
+Requires Python 3.10+, a Ganivra workspace key, and an OpenAI API key. This
+example makes one paid model call using your OpenAI account.
+
+```bash
+python -m pip install ganivra
+export GANIVRA_API_KEY="YOUR_WORKSPACE_KEY"
+export OPENAI_API_KEY="YOUR_OPENAI_KEY"
+```
+
+Save this as `track_cost.py` and run `python track_cost.py`.
+
+```python
+import os
+import ganivra
+from openai import OpenAI
+
+ganivra.init(api_key=os.environ["GANIVRA_API_KEY"])
+client = OpenAI()
+
+with ganivra.trace(
+    application="support-app",
+    workflow="support_answer",
+    customer_id="demo_customer",
+):
+    response = client.responses.create(
+        model="gpt-6.1-sol",
+        input="Write a one-sentence acknowledgement of a support request.",
+    )
+
+ganivra.flush()
+print(response.output_text)
+```
+
+Open your dashboard, filter by application `support-app`, and inspect the
+execution to see its model usage and recorded cost for `demo_customer`.
+Configure customer pricing or report revenue to calculate contribution and margin.
+
+`flush()` waits briefly for the best-effort queue to drain. It does not confirm
+server acceptance. If the event is missing, check your workspace key and endpoint.
+
+## Choose your next step
+
+| You want to… | Start here |
+| --- | --- |
+| Group calls by customer and billable action | [Business context](#add-business-context-for-unit-economics) |
+| Capture Claude usage | [Claude setup](#automatic-claude-capture-06) |
+| Include tool costs | [MCP instrumentation](#track-mcp-tool-calls-through-the-same-api) |
+| Connect confirmed payments | [Revenue transactions](#record-confirmed-purchases-optional) |
+| Submit usage from another provider | [REST client guide](REST_CLIENT.md) |
 
 ## Version 0.6 capability status
 
